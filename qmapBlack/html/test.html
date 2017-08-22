@@ -502,6 +502,8 @@ var night = [
 var map;
 // container for markers
 var markers = [];
+//
+var infowindows = [];
 var citymap = [
     {
         lat: 40.90532,
@@ -541,21 +543,25 @@ function initMap() {
         scrollwheel : false,
         draggable: false,
         disableDefaultUI: true,
-        // disableDoubleClickZoom: true,
+        disableDoubleClickZoom: true,
         styles : black
     };
-    map = new google.maps.Map(document.getElementById("map"),mapOptions);
-    var infowindow = new google.maps.InfoWindow({
-        content: ''
-    });
 
-    // for (var i = 0; i < Object.keys(citymap).length; i++) {
-        
-        // clearMarkers();
-        for (var i = 0; i < Object.keys(citymap).length; i++) {
-            addMarkerWithTimeout(i, infowindow);
-        }
-    // }
+    // create google map
+    map = new google.maps.Map(document.getElementById("map"),mapOptions);
+
+
+    // add markers to map
+    for (var i = 0; i < Object.keys(citymap).length; i++) {
+        // i-th marker
+        var infowindow = new google.maps.InfoWindow({
+            content: "<p>" + citymap[i].title + "</p>"
+        });
+
+        // add infowindow to the array for later reference
+        infowindows.push(infowindow);
+        addMarkerWithTimeout(i, infowindow);
+    }
 
 }
 
@@ -572,10 +578,10 @@ function bindInfoWindow(marker, map, infowindow, html) {
 }
 
 /**
- * @param i index of marker
+ * @param i index of marker whose info is in the array citymap
  */
 function addMarkerWithTimeout(i, infowindow) {
-    var timeout = i*500;
+    var timeout = i*2000;
     window.setTimeout(function() {
         // cirty circle is a marker
         var cityCircle = new google.maps.Marker({
@@ -595,31 +601,25 @@ function addMarkerWithTimeout(i, infowindow) {
         });
         bindInfoWindow(cityCircle, map,infowindow, "<p>" + citymap[i].title + "</p>");
 
+        // close the infowindow of the previous element
+        if(i > 0){
+            infowindows[i-1].close();
+        }
+
+        infowindows[i].setContent("<p>" + citymap[i].title + "</p>"); 
+        infowindows[i].open(map, cityCircle);
+        if(i == infowindows.length-1) {
+            // close the last window
+            window.setTimeout(function(){infowindows[i].close();}, 1000);
+        }
         // store marker to containter
         markers.push(cityCircle);
     }, timeout);
 }
 
 
-function clearMarkers() {
-  for (var i = 0; i < markers.length; i++) {
-    markers[i].setMap(null);
-  }
-  markers = [];
-}
-
-function drop() {
-
-  clearMarkers();
-  for (var i = 0; i < Object.keys(citymap).length; i++) {
-    addMarkerWithTimeout(i);
-  }
-      console.log("dropping");
-}
-
-
 </script>
-<script  type="text/javascript" async defer
+<script type="text/javascript" async defer
     src="https://maps.googleapis.com/maps/api/js?v=3.28&key=AIzaSyBwd6-i2YXX7aQ-NzlFizoiuUnL85Hlmk4&callback=initMap">
 </script>
 
