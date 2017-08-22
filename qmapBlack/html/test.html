@@ -581,7 +581,13 @@ function bindInfoWindow(marker, map, infowindow, html) {
  * @param i index of marker whose info is in the array citymap
  */
 function addMarkerWithTimeout(i, infowindow) {
-    var timeout = i*2000;
+    /* To turn on/off the timeout feature, change the value of delay
+        off: delay = 0
+        on: delay > 0
+    */
+    var delay = 2000;
+    var timeout = i*delay;
+    
     window.setTimeout(function() {
         // cirty circle is a marker
         var cityCircle = new google.maps.Marker({
@@ -608,9 +614,15 @@ function addMarkerWithTimeout(i, infowindow) {
 
         infowindows[i].setContent("<p>" + citymap[i].title + "</p>"); 
         infowindows[i].open(map, cityCircle);
-        if(i == infowindows.length-1) {
+        if(delay <= 0) {
+            infowindows[i].close();
+        } else if(i == infowindows.length-1) {
             // close the last window
-            window.setTimeout(function(){infowindows[i].close();}, 1000);
+            window.setTimeout(function(){
+                infowindows[i].close();
+                infowindows[0].open(map, markers[0]);
+            }, delay);
+            
         }
         // store marker to containter
         markers.push(cityCircle);
