@@ -36,30 +36,10 @@ div.info {
     border: 3px solid #ebebeb;
     padding: 10px;
 }
-
-/*set infowindow to be transparent*/
-.gm-style > div:first-child > div + div > div:last-child > div > div:first-child > div{
-    background-color: transparent !important;
-}
-
-/*infowindow's title color and font*/
-.gm-style-iw {
-    color: white;
-    font-family: helvetica;
-/*    background: #fff;*/
-}
-
-/*set infowindow's arrow to be transparent*/
-.gm-style div div div div div div div div {
-    background-color: transparent !important;
-}
-
-/*hide close button*/
-.gm-style .gm-style-iw + div {
-    display: none; 
-}
 </style>
+<script type="text/javascript"  src="infobubble.js"></script>
 <script type="text/javascript">
+
 
 var black = [
   {
@@ -574,10 +554,12 @@ function initMap() {
 
 
     // add markers to map
-// while(1){
     for (var i = 0; i < Object.keys(citymap).length; i++) {
         // i-th marker
-        var infowindow = new google.maps.InfoWindow({
+        // var infowindow = new google.maps.InfoWindow({
+        var infowindow = new InfoBubble({
+            map: map,
+            backgroundColor: 'rgb(57,57,57)',
             content: "<p>" + citymap[i].title + "</p>"
         });
 
@@ -585,7 +567,6 @@ function initMap() {
         infowindows.push(infowindow);
         addMarkerWithTimeout(i, infowindow);
     }
-// }
 
 }
 
@@ -605,13 +586,7 @@ function bindInfoWindow(marker, map, infowindow, html) {
  * @param i index of marker whose info is in the array citymap
  */
 function addMarkerWithTimeout(i, infowindow) {
-    /* To turn on/off the timeout feature, change the value of delay
-        off: delay = 0
-        on: delay > 0
-    */
-    var delay = 2000;
-    var timeout = i*delay;
-    
+    var timeout = i*2000;
     window.setTimeout(function() {
         // cirty circle is a marker
         var cityCircle = new google.maps.Marker({
@@ -638,15 +613,9 @@ function addMarkerWithTimeout(i, infowindow) {
 
         infowindows[i].setContent("<p>" + citymap[i].title + "</p>"); 
         infowindows[i].open(map, cityCircle);
-        if(delay <= 0) {
-            infowindows[i].close();
-        } else if(i == infowindows.length-1) {
+        if(i == infowindows.length-1) {
             // close the last window
-            window.setTimeout(function(){
-                infowindows[i].close();
-                // infowindows[0].open(map, markers[0]);
-            }, delay);
-            
+            window.setTimeout(function(){infowindows[i].close();}, 1000);
         }
         // store marker to containter
         markers.push(cityCircle);
